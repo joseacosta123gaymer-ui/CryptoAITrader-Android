@@ -1,0 +1,27 @@
+.env
+*.pyc
+__pycache__/
+.pytest_cache/
+.gradle/
+.idea/
+local.properties
+android/local.properties
+android/app/build/
+server/user_data/config.json
+server/user_data/tradesv3.sqlite*
+server/user_data/logs/*
+server/user_data/models/*
+server/user_data/backtest_results/*
+
+# Private credentials and runtime data
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+server/user_data/
+freqtrade/user_data/

@@ -1,0 +1,70 @@
+name: crypto-ai-trader
+services:
+  freqtrade:
+    build:
+      context: ./freqtrade
+      dockerfile: Dockerfile.cryptoai
+    image: crypto-ai-trader/freqtrade-freqai:local
+    entrypoint: ["/bin/bash", "/opt/start-freqtrade.sh"]
+    environment:
+      FT_API_USERNAME: ${FT_API_USERNAME:?Run deploy/init_env.py first}
+      FT_API_PASSWORD: ${FT_API_PASSWORD:?Run deploy/init_env.py first}
+      FT_JWT_SECRET: ${FT_JWT_SECRET:?Run deploy/init_env.py first}
+      FT_WS_TOKEN: ${FT_WS_TOKEN:?Run deploy/init_env.py first}
+      EXCHANGE_NAME: ${EXCHANGE_NAME:-binance}
+      EXCHANGE_API_KEY: ${EXCHANGE_API_KEY:-}
+      EXCHANGE_SECRET: ${EXCHANGE_SECRET:-}
+    volumes:
+      - ./server/user_data:/freqtrade/user_data
+      - ./server/generate_config.py:/opt/generate_config.py:ro
+      - ./server/start-freqtrade.sh:/opt/start-freqtrade.sh:ro
+    expose:
+      - "8080"
+    restart: unless-stopped
+    networks:
+      - backend
+
+  gateway:
+    build: ./server
+    image: crypto-ai-trader/gateway:local
+    environment:
+      APP_API_TOKEN: ${APP_API_TOKEN:?Run deploy/init_env.py first}
+      FT_API_USERNAME: ${FT_API_USERNAME:?Run deploy/init_env.py first}
+      FT_API_PASSWORD: ${FT_API_PASSWORD:?Run deploy/init_env.py first}
+      FT_API_URL: http://freqtrade:8080
+    expose:
+      - "8000"
+    depends_on:
+      - freqtrade
+    restart: unless-stopped
+    networks:
+      - backend
+      - edge
+
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?Set APP_DOMAIN in .env to a domain pointing to this server}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - gateway
+    restart: unless-stopped
+    networks:
+      - edge
+
+networks:
+  backend:
+    driver: bridge
+  edge:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

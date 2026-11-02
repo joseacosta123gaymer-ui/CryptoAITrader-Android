@@ -1,0 +1,10 @@
+<resources>
+    <style name="Theme.CryptoAITrader" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#29D3A2</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">#0B1220</item>
+        <item name="android:navigationBarColor">#0B1220</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+</resources>

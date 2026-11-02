@@ -1,0 +1,3 @@
+Crypto AI Trader Android 0.2.0
+Freqtrade source: user-supplied freqtrade-develop archive
+Mode: Spot Dry-run only
